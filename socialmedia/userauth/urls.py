@@ -20,9 +20,13 @@ urlpatterns = [
     path('follow', views.follow, name='follow'),
     path('add-comment/<str:id>', views.add_comment, name='add_comment'),
     path('view-comments/<str:id>/', views.view_comments, name='view_comments'),  
+    path('chat/', views.chat_home, name='chat_home'),
+    path('chat/<uuid:room_id>/', views.chat_room, name='chat_room'),
+    path('chat/start/<str:username>/', views.start_chat, name='start_chat'),
+
     
     
     
-    
+  
     
 ]

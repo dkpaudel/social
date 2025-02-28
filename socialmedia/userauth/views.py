@@ -298,3 +298,46 @@ def view_comments(request, id):
     comments = Comment.objects.filter(post_id=post.id).order_by('-created_at')  # Show latest comments first
     return render(request, 'comments.html', {'post': post, 'comments': comments})
 
+
+
+
+from .models import ChatRoom, ChatMessage
+from django.contrib.auth.models import User
+
+@login_required(login_url='/loginn')
+def chat_home(request):
+    chat_rooms = ChatRoom.objects.filter(Q(user1=request.user) | Q(user2=request.user))
+    return render(request, 'chat/chat_home.html', {'chat_rooms': chat_rooms})
+
+@login_required(login_url='/loginn')
+def chat_room(request, room_id):
+    room = get_object_or_404(ChatRoom, id=room_id)
+    if request.user not in [room.user1, room.user2]:
+        return redirect('chat_home')
+
+    if request.method == "POST":
+        text = request.POST.get('text')
+        ChatMessage.objects.create(room=room, sender=request.user, message=text)
+        return redirect(f'/chat/{room_id}/')
+
+    messages = ChatMessage.objects.filter(room=room).order_by('timestamp')
+    chat_partner = room.user2 if room.user1 == request.user else room.user1
+    return render(request, 'chat/chat_room.html', {'room': room, 'messages': messages, 'chat_partner': chat_partner})
+
+@login_required(login_url='/loginn')
+
+def start_chat(request, username):
+    user_to_chat = get_object_or_404(User, username=username)
+
+    # Check if a chat room already exists between these users (in any order)
+    room = ChatRoom.objects.filter(
+        (Q(user1=request.user) & Q(user2=user_to_chat)) |
+        (Q(user1=user_to_chat) & Q(user2=request.user))
+    ).first()
+
+    # If no existing chat room, create a new one
+    if not room:
+        room = ChatRoom.objects.create(user1=request.user, user2=user_to_chat)
+
+    return redirect(f'/chat/{room.id}/')
+

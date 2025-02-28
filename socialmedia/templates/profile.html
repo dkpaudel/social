@@ -96,6 +96,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'chat_home' %}">
+                            <i class="fa-solid fa-comments"></i> Chat
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="/logoutt">
                             <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
                         </a>
@@ -151,6 +156,8 @@
                                                 data-bs-whatever="@getbootstrap">
                                                 {{follow_unfollow}}
                                             </button>
+                                            <a href="/chat/start/{{user_profile.user.username}}">Message</a>
+
 
                                             {% endif %}
 </form>

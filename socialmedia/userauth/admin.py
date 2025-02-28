@@ -10,4 +10,5 @@ admin.site.register(LikePost)
 admin.site.register(Followers)
 admin.site.register(DislikePost)
 admin.site.register(Comment)
-
+admin.site.register(ChatRoom)
+admin.site.register(ChatMessage)

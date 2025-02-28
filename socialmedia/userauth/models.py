@@ -68,4 +68,21 @@ class Followers(models.Model):
         return self.user
 
     
-    
+
+
+class ChatRoom(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user1 = models.ForeignKey(User, related_name='chat_user1', on_delete=models.CASCADE)
+    user2 = models.ForeignKey(User, related_name='chat_user2', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Chat between {self.user1.username} and {self.user2.username}"
+class ChatMessage(models.Model):
+    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.sender.username}: {self.message[:20]}"
