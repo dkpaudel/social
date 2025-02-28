@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from . models import  Followers, LikePost, DislikePost,Post, Profile
+from . models import  Followers, LikePost, DislikePost,Post,Comment, Profile
 from django.db.models import Q
 
 
@@ -100,48 +100,45 @@ def upload(request):
         return redirect('/')
 
 
+# from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Post, LikePost, DislikePost  # Ensure you import the necessary models
+
 @login_required(login_url='/loginn')
 def likes(request, id):
     if request.method == 'GET':
         username = request.user.username
-        post = get_object_or_404(Post, id=id)
+        post = get_object_or_404(Post, id=id)  # Fetch the post using UUID
 
-        like_filter = LikePost.objects.filter(post_id=id, username=username).first()
-
-      
-        dislike_filter = DislikePost.objects.filter(post_id=id, username=username).first()
+        like_filter = LikePost.objects.filter(post_id=post.id, username=username).first()
+        dislike_filter = DislikePost.objects.filter(post_id=post.id, username=username).first()
 
         if like_filter is None:
-
+            # If the user had disliked the post before, remove the dislike
             if dislike_filter:
                 dislike_filter.delete()
                 post.no_of_dislikes -= 1
 
-        
-            new_like = LikePost.objects.create(post_id=id, username=username)
+            # Add a new like
+            LikePost.objects.create(post_id=post.id, username=username)
             post.no_of_likes += 1
         else:
-          
+            # Remove the like if already liked
             like_filter.delete()
             post.no_of_likes -= 1
 
         post.save()
-        return redirect('/#' + id)
-
-
+        return redirect('/#' + str(post.id))  # UUID should be converted to string
 
 
 @login_required(login_url='/loginn')
 def dislikes(request, id):
     if request.method == 'GET':
         username = request.user.username
-        post = get_object_or_404(Post, id=id)
+        post = get_object_or_404(Post, id=id)  # Fetch the post using UUID
 
-        # Check if the user has already disliked the post
-        dislike_filter = DislikePost.objects.filter(post_id=id, username=username).first()
-
-        # Check if the user has liked the post before
-        like_filter = LikePost.objects.filter(post_id=id, username=username).first()
+        dislike_filter = DislikePost.objects.filter(post_id=post.id, username=username).first()
+        like_filter = LikePost.objects.filter(post_id=post.id, username=username).first()
 
         if dislike_filter is None:
             # If the user had liked the post, remove the like first
@@ -149,17 +146,16 @@ def dislikes(request, id):
                 like_filter.delete()
                 post.no_of_likes -= 1
 
-            # Add a dislike
-            new_dislike = DislikePost.objects.create(post_id=id, username=username)
+            # Add a new dislike
+            DislikePost.objects.create(post_id=post.id, username=username)
             post.no_of_dislikes += 1
         else:
-            # Remove the dislike
+            # Remove the dislike if already disliked
             dislike_filter.delete()
             post.no_of_dislikes -= 1
 
         post.save()
-        return redirect('/#' + id)
-
+        return redirect('/#' + str(post.id))  # UUID should be converted to string
     
 @login_required(login_url='/loginn')
 def explore(request):
@@ -280,3 +276,25 @@ def follow(request):
             return redirect('/profile/'+user)
     else:
         return redirect('/')
+    
+
+
+
+@login_required(login_url='/loginn')
+def add_comment(request, id):
+    if request.method == "POST":
+        text = request.POST.get('text')  # Get comment text from form
+        username = request.user.username
+        post = get_object_or_404(Post, id=id)
+        
+        if text.strip():  # Ensure comment is not empty
+            Comment.objects.create(post_id=post.id, username=username, text=text)
+        
+    return redirect('/')
+
+
+def view_comments(request, id):
+    post = get_object_or_404(Post, id=id)
+    comments = Comment.objects.filter(post_id=post.id).order_by('-created_at')  # Show latest comments first
+    return render(request, 'comments.html', {'post': post, 'comments': comments})
+

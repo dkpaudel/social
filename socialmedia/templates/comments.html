@@ -1,0 +1,15 @@
+
+{% for comment in comments %}
+    <div class="bg-white shadow-md rounded-lg p-4 mb-4">
+        <div class="flex items-center space-x-3">
+        
+           
+            <div>
+                <strong class="text-xl text-gray-800">{{ comment.username }} commented...</strong>
+                <p class="text-gray-600 mt-2">{{ comment.text }}</p>
+                <small class="text-xs text-gray-500">{{ comment.created_at }}</small>
+            </div>
+            <hr>
+        </div>
+    </div>
+{% endfor %}

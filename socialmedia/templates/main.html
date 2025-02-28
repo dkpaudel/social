@@ -114,6 +114,36 @@
                                         </a>
                                         <p>{{ pos.no_of_dislikes }}</p>
                                     </div>
+                                   
+                                    <!-- Comment Buttons -->
+                                    <div class="d-flex justify-content-between">
+                                        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#commentModal{{pos.id}}">📝 Add Comment</button>
+                                        <a href="/view-comments/{{pos.id}}" class="btn btn-outline-info">💬 View Comments</a>
+                                    </div>
+                              
+                         
+                                  
+                                    
+                                    <!-- Add Comment Modal -->
+                                    <div class="modal fade" id="commentModal{{pos.id}}" tabindex="-1" aria-labelledby="commentModalLabel{{pos.id}}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="commentModalLabel{{pos.id}}">Add Comment</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form method="POST" action="/add-comment/{{pos.id}}">
+                                                        {% csrf_token %}
+                                                        <textarea name="text" class="form-control" placeholder="Write a comment..." required></textarea>
+                                                        <br>
+                                                        <button type="submit" class="btn btn-primary">Submit Comment</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
                                     
                                     
                                     

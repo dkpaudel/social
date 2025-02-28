@@ -18,7 +18,8 @@ urlpatterns = [
     path('delete/<str:id>', views.delete),
     path('search-results/', views.search_results, name='search_results'),
     path('follow', views.follow, name='follow'),
-    
+    path('add-comment/<str:id>', views.add_comment, name='add_comment'),
+    path('view-comments/<str:id>/', views.view_comments, name='view_comments'),  
     
     
     

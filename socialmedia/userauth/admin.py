@@ -9,5 +9,5 @@ admin.site.register(Post)
 admin.site.register(LikePost)
 admin.site.register(Followers)
 admin.site.register(DislikePost)
-
+admin.site.register(Comment)
 

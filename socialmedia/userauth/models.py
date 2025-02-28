@@ -17,8 +17,9 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
+
 class Post(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.CharField(max_length=100)
     image = models.ImageField(upload_to='post_images')
     caption = models.TextField()
@@ -27,7 +28,8 @@ class Post(models.Model):
     no_of_dislikes = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.user
+        return f"Post by {self.user} - {self.id}"
+
 
 class LikePost(models.Model):
     post_id = models.CharField(max_length=500)
@@ -42,6 +44,20 @@ class DislikePost(models.Model):
 
     def __str__(self):
         return self.username
+
+
+
+class Comment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)  # Unique ID for each comment
+    post_id = models.CharField(max_length=500,default=0)
+    username= models.CharField(max_length=100,default="")
+    text = models.TextField()
+    created_at = models.DateTimeField(default=datetime.now)
+
+    def __str__(self):
+        return f"Comment by {self.username} on {self.post_id}"
+
+
 
 
 class Followers(models.Model):
