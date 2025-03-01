@@ -11,33 +11,42 @@ from django.db.models import Q
 
 
 def signup(request):
- try:
     if request.method == 'POST':
-        fnm=request.POST.get('fnm')
-        emailid=request.POST.get('emailid')
-        pwd=request.POST.get('pwd')
-        print(fnm,emailid,pwd)
-        my_user=User.objects.create_user(fnm,emailid,pwd)
+        fnm = request.POST.get('fnm')  # Username
+        emailid = request.POST.get('emailid')  # Email
+        pwd = request.POST.get('pwd')  # Password
+        confirm_pwd = request.POST.get('confirm_pwd')  # Password confirmation
+
+        # Check if any field is empty
+        if not fnm or not emailid or not pwd or not confirm_pwd:
+            return render(request, 'signup.html', {'invalid': "All fields are required."})
+
+        # Check if passwords match
+        if pwd != confirm_pwd:
+            return render(request, 'signup.html', {'invalid': "Passwords do not match."})
+
+        # Check if username already exists
+        if User.objects.filter(username=fnm).exists():
+            return render(request, 'signup.html', {'invalid': "Username already exists."})
+
+        # Check if email already exists
+        if User.objects.filter(email=emailid).exists():
+            return render(request, 'signup.html', {'invalid': "Email is already registered."})
+
+        # Create the user
+        my_user = User.objects.create_user(username=fnm, email=emailid, password=pwd)
         my_user.save()
-        user_model = User.objects.get(username=fnm)
-        new_profile = Profile.objects.create(user=user_model, id_user=user_model.id)
+
+        # Create the Profile linked to the user
+        new_profile = Profile.objects.create(user=my_user, id_user=my_user.id)
         new_profile.save()
-        if my_user is not None:
-            login(request,my_user)
-            return redirect('/')
-        return redirect('/loginn')
-    
-        
- except:
-        invalid="User already exists"
-        return render(request, 'signup.html',{'invalid':invalid})
-  
-    
- return render(request, 'signup.html')
-        
-     
-        
-        
+
+        # Log the user in
+        login(request, my_user)
+        return redirect('/')
+
+    return render(request, 'signup.html')
+       
         
         
     
@@ -170,7 +179,7 @@ def explore(request):
     return render(request, 'explore.html',context)
     
 @login_required(login_url='/loginn')
-def profile(request,id_user):
+def profile(request,id_user  ):
     user_object = User.objects.get(username=id_user)
     print(user_object)
     profile = Profile.objects.get(user=request.user)
@@ -270,13 +279,12 @@ def follow(request):
             delete_follower = Followers.objects.get(follower=follower, user=user)
             delete_follower.delete()
             return redirect('/profile/'+user)
-        else:
+        else:    
             new_follower = Followers.objects.create(follower=follower, user=user)
             new_follower.save()
             return redirect('/profile/'+user)
     else:
         return redirect('/')
-    
 
 
 
@@ -290,14 +298,27 @@ def add_comment(request, id):
         if text.strip():  # Ensure comment is not empty
             Comment.objects.create(post_id=post.id, username=username, text=text)
         
-    return redirect('/')
+    return redirect('/#' + str(post.id))
 
 
-def view_comments(request, id):
+
+from django.http import JsonResponse
+
+
+def fetch_comments(request, id):
     post = get_object_or_404(Post, id=id)
-    comments = Comment.objects.filter(post_id=post.id).order_by('-created_at')  # Show latest comments first
-    return render(request, 'comments.html', {'post': post, 'comments': comments})
+    comments = Comment.objects.filter(post_id=post.id).order_by('-created_at')
+    
+    comments_data = [
+        {
+            "username": comment.username,
+            "text": comment.text,
+            "created_at": comment.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        }
+        for comment in comments
+    ]
 
+    return JsonResponse({"comments": comments_data})
 
 
 

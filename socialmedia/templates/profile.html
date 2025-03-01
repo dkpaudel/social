@@ -14,7 +14,7 @@
     <title>{{user_profile.user}}</title>
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
     <style>
-        /* Custom styles for the sidebar */
+       
         .sidebar {
             background-color: #f8f9fa;
             height: 100vh;
@@ -109,7 +109,7 @@
             </nav>
             {% load static %}
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
-                <!-- Your main content goes here -->
+               
                 {% include "search.html" %}
                 {% include "profile_upload.html" %}
                 {% include "edit_profile.html" %}
@@ -146,22 +146,23 @@
 
                                         </div>
                                         <div style="margin-inline-start: auto; margin-top: auto;background:white;">
-                                        <form action="/follow" method="POST">
-                                            {% csrf_token %}  {% if user != user_profile.user %}
-                                            <input type="hidden" value="{{user.username}}" name="follower" />
-                                            <input type="hidden" value="{{user_object.username}}" name="user" />
-                                            <button type="submit" class="btn btn-outline-dark"
-                                                data-mdb-ripple-color="dark" style="z-index: 1; margin: 5px;"
-                                                data-bs-toggle="modal" data-bs-target="#exampleModal1"
-                                                data-bs-whatever="@getbootstrap">
-                                                {{follow_unfollow}}
-                                            </button>
-                                            <a href="/chat/start/{{user_profile.user.username}}">Message</a>
-
-
-                                            {% endif %}
-</form>
-                                        </div>
+                                            <form action="/follow" method="POST">
+                                                {% csrf_token %}  {% if user != user_profile.user %}
+                                                <input type="hidden" value="{{user.username}}" name="follower" />
+                                                <input type="hidden" value="{{user_object.username}}" name="user" />
+                                                <button type="submit" class="btn btn-outline-dark"
+                                                    data-mdb-ripple-color="dark" style="z-index: 1; margin: 5px;"
+                                                    data-bs-toggle="modal" data-bs-target="#exampleModal1"
+                                                    data-bs-whatever="@getbootstrap">
+                                                    {{follow_unfollow}}
+                                                </button>
+                                                <a href="/chat/start/{{user_profile.user.username}}">Message</a>
+    
+    
+                                                {% endif %}
+    </form>
+                                            </div>
+    
 
                                     </div>
                                     <div class="p-4 text-black" style="background-color: #f8f9fa;">
@@ -235,4 +236,6 @@
         crossorigin="anonymous"></script>
 </body>
 
-</html>
+</html> 
+
+
