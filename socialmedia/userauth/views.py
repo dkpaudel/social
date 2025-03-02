@@ -116,6 +116,7 @@ from .models import Post, LikePost, DislikePost  # Ensure you import the necessa
 @login_required(login_url='/loginn')
 def likes(request, id):
     if request.method == 'GET':
+    
         username = request.user.username
         post = get_object_or_404(Post, id=id)  # Fetch the post using UUID
 
@@ -127,18 +128,20 @@ def likes(request, id):
             if dislike_filter:
                 dislike_filter.delete()
                 post.no_of_dislikes -= 1
-
+             
             # Add a new like
             LikePost.objects.create(post_id=post.id, username=username)
             post.no_of_likes += 1
+           
         else:
             # Remove the like if already liked
             like_filter.delete()
             post.no_of_likes -= 1
+          
 
         post.save()
+   
         return redirect('/#' + str(post.id))  # UUID should be converted to string
-
 
 @login_required(login_url='/loginn')
 def dislikes(request, id):
@@ -297,6 +300,8 @@ def add_comment(request, id):
         
         if text.strip():  # Ensure comment is not empty
             Comment.objects.create(post_id=post.id, username=username, text=text)
+            post.no_of_comments += 1
+            post.save()
         
     return redirect('/#' + str(post.id))
 
@@ -361,4 +366,53 @@ def start_chat(request, username):
         room = ChatRoom.objects.create(user1=request.user, user2=user_to_chat)
 
     return redirect(f'/chat/{room.id}/')
+
+
+def fetch_likes(request, id):
+    post = get_object_or_404(Post, id=id)
+    likes= LikePost.objects.filter(post_id=post.id)
+    
+    likes_data = [
+        {
+            "username": like.username,
+            
+        }
+        for like in likes
+    ]
+    return JsonResponse({"likes": likes_data})
+
+def fetch_dislikes(request, id):
+    post = get_object_or_404(Post, id=id)
+    dislikes= DislikePost.objects.filter(post_id=post.id)
+    
+    dislikes_data = [
+        {
+            "username": dislike.username,
+            
+        }
+        for dislike in dislikes
+    ]
+    return JsonResponse({"dislikes": dislikes_data})
+
+def fetch_followers(request,username):
+   followers= Followers.objects.filter(user=username)
+   followers_data=[
+       {
+           "username":follower.follower
+       }
+       for follower in followers
+   ]
+   return JsonResponse({"followers":followers_data})
+
+def fetch_followings(request,username):
+   followings= Followers.objects.filter(follower=username)
+   followings_data=[
+       {
+           "username":following.user
+       }
+       for following in followings
+   ]
+   return JsonResponse({"followings":followings_data})
+
+
 

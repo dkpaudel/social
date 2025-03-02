@@ -23,10 +23,13 @@ urlpatterns = [
     path('chat/', views.chat_home, name='chat_home'),
     path('chat/<uuid:room_id>/', views.chat_room, name='chat_room'),
     path('chat/start/<str:username>/', views.start_chat, name='start_chat'),
+    path('fetch-likes/<str:id>/', views.fetch_likes, name='fetch_liked_users'),
+    path('fetch-dislikes/<str:id>/', views.fetch_dislikes, name='fetch_disliked_users'),
+    path('fetch-followers/<str:username>/', views.fetch_followers),
+    path('fetch-followings/<str:username>/', views.fetch_followings),
 
-    
-    
+]
     
   
     
-]
+

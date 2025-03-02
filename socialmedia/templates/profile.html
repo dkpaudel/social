@@ -14,7 +14,6 @@
     <title>{{user_profile.user}}</title>
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
     <style>
-       
         .sidebar {
             background-color: #f8f9fa;
             height: 100vh;
@@ -109,10 +108,11 @@
             </nav>
             {% load static %}
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
-               
+
                 {% include "search.html" %}
                 {% include "profile_upload.html" %}
                 {% include "edit_profile.html" %}
+                {% include "modal.html" %}
                 <section class="gradient-custom-2">
                     <div class="container py-5">
                         <div class="row d-flex justify-content-center align-items-center h-100">
@@ -139,6 +139,9 @@
 
 
                                         </div>
+                                    
+                                    
+                                        
                                         <div class="ms-3" style="margin-top: 130px;">
                                             <h5>@{{user_profile.user}}</h5>
 
@@ -147,7 +150,7 @@
                                         </div>
                                         <div style="margin-inline-start: auto; margin-top: auto;background:white;">
                                             <form action="/follow" method="POST">
-                                                {% csrf_token %}  {% if user != user_profile.user %}
+                                                {% csrf_token %} {% if user != user_profile.user %}
                                                 <input type="hidden" value="{{user.username}}" name="follower" />
                                                 <input type="hidden" value="{{user_object.username}}" name="user" />
                                                 <button type="submit" class="btn btn-outline-dark"
@@ -156,31 +159,74 @@
                                                     data-bs-whatever="@getbootstrap">
                                                     {{follow_unfollow}}
                                                 </button>
-                                                <a href="/chat/start/{{user_profile.user.username}}">Message</a>
-    
-    
+                                                <button type="button" class="btn btn-outline-dark"
+                                                data-mdb-ripple-color="dark" style="z-index: 1; margin: 5px;">
+                                                <a href="/chat/start/{{user_profile.user.username}}" style="text-decoration: none;">Message</a>
+
+                                              
+                                            </button>
+                                              
+
                                                 {% endif %}
-    </form>
-                                            </div>
-    
+                                            </form>
+                                        </div>
+
 
                                     </div>
-                                    <div class="p-4 text-black" style="background-color: #f8f9fa;">
-                                        <div class="d-flex justify-content-end text-center py-1">
+                                    <div class="p-4 text-black bg-light rounded shadow-sm">
+                                        <div class="d-flex justify-content-center text-center gap-4">
+                                            <!-- Photos Count -->
                                             <div>
-                                                <p class="mb-1 h5">{{user_post_length}}</p>
+                                                <p class="mb-1 fw-bold h5">{{ user_post_length }}</p>
                                                 <p class="small text-muted mb-0">Photos</p>
                                             </div>
-                                            <div class="px-3">
-                                                <p class="mb-1 h5">{{user_followers}}</p>
+                                    
+                                            <!-- Followers Count -->
+                                            <div>
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#followersModal"
+                                                    onclick="loadFollowers('{{ user_profile.user.username }}')" class="text-dark text-decoration-none">
+                                                    <p class="mb-1 fw-bold h5">{{ user_followers }}</p>
+                                                </a>
                                                 <p class="small text-muted mb-0">Followers</p>
                                             </div>
+                                    
+                                            <!-- Following Count -->
                                             <div>
-                                                <p class="mb-1 h5">{{user_following}}</p>
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#followingsModal"
+                                                    onclick="loadFollowings('{{ user_profile.user.username }}')" class="text-dark text-decoration-none">
+                                                    <p class="mb-1 fw-bold h5">{{ user_following }}</p>
+                                                </a>
                                                 <p class="small text-muted mb-0">Following</p>
                                             </div>
                                         </div>
                                     </div>
+                                    
+
+                                    <!-- <div class="modal fade" id="followersModal" tabindex="-1"
+                                        aria-labelledby="followersModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-scrollable">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="followersModalLabel">Followers</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div id="followersContainer"
+                                                        class="overflow-y-auto h-64 bg-gray-100 rounded-lg p-3 shadow-inner border">
+                                                        <p class="text-gray-500 text-center">Loading users...</p>
+                                                    </div>
+
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                    <br>
+                                    <br><br><br>
                                     <div class="card-body p-4 text-black">
                                         <div class="mb-5">
                                             <p class="lead fw-normal mb-1">About</p>
@@ -234,8 +280,72 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
+    <script>
+        function loadFollowers(username) {
+            fetch(`/fetch-followers/${username}/`)
+                .then(response => response.json())
+                .then(data => {
+                    let followersContainer = document.getElementById("followersContainer");
+                    followersContainer.innerHTML = ""; // Clear previous comments
+
+                    if (data.followers.length > 0) {
+                        data.followers.forEach(follower => {
+                            let followerHTML = `
+        <div class="flex items-start space-x-3 bg-white shadow-lg rounded-xl p-4 border border-gray-200 mb-4">
+           
+            <div class="flex-1">
+                <div class="flex justify-between items-center">
+                    <a href="/profile/${follower.username}">
+                    <strong class="text-lg text-gray-900">@${follower.username}</strong></a>
+                 
+                </div>
+                
+            </div>
+        </div>`;
+
+                            followersContainer.innerHTML += followerHTML;
+                        });
+                    } else {
+                        followersContainer.innerHTML = "<p>No followers yet.</p>";
+                    }
+                })
+                .catch(error => console.error("Error fetching data:", error));
+        }
+
+    </script>
+    <script>
+        function loadFollowings(username) {
+            fetch(`/fetch-followings/${username}/`)
+                .then(response => response.json())
+                .then(data => {
+                    let followingsContainer = document.getElementById("followingsContainer");
+                    followingsContainer.innerHTML = ""; // Clear previous comments
+
+                    if (data.followings.length > 0) {
+                        data.followings.forEach(following => {
+                            let followingHTML = `
+        <div class="flex items-start space-x-3 bg-white shadow-lg rounded-xl p-4 border border-gray-200 mb-4">
+           
+            <div class="flex-1">
+                <div class="flex justify-between items-center">
+                    <a href="/profile/${following.username}">
+                    <strong class="text-lg text-gray-900">@${following.username}</strong></a>
+                 
+                </div>
+                
+            </div>
+        </div>`;
+
+                            followingsContainer.innerHTML += followingHTML;
+                        });
+                    } else {
+                        followingsContainer.innerHTML = "<p>No followings yet.</p>";
+                    }
+                })
+                .catch(error => console.error("Error fetching data:", error));
+        }
+
+    </script>
 </body>
 
-</html> 
-
-
+</html>

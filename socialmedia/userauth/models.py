@@ -26,6 +26,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(default=datetime.now)
     no_of_likes = models.IntegerField(default=0)
     no_of_dislikes = models.IntegerField(default=0)
+    no_of_comments=models.IntegerField(default=0)
 
     def __str__(self):
         return f"Post by {self.user} - {self.id}"
