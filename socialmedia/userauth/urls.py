@@ -27,6 +27,8 @@ urlpatterns = [
     path('fetch-dislikes/<str:id>/', views.fetch_dislikes, name='fetch_disliked_users'),
     path('fetch-followers/<str:username>/', views.fetch_followers),
     path('fetch-followings/<str:username>/', views.fetch_followings),
+ 
+
 
 ]
     

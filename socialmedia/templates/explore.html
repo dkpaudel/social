@@ -157,6 +157,19 @@
 
                 {% include "modal.html" %}
                 {% include "search.html" %}
+                <div class="container text-center" style="padding: 10px; margin-top: 20px;">
+                    <form method="GET" action="/explore" class="mb-3">
+                        <label for="sort_by"><strong>Sort by:</strong></label>
+                        <select name="sort_by" id="sort_by" class="form-select d-inline w-auto" onchange="this.form.submit()">
+                            <option value="-created_at" {% if request.GET.sort_by == "-created_at" %}selected{% endif %}>Most Recent</option>
+                            <option value="created_at" {% if request.GET.sort_by == "created_at" %}selected{% endif %}>Oldest</option>
+                            <option value="-no_of_likes" {% if request.GET.sort_by == "-no_of_likes" %}selected{% endif %}>Most Liked</option>
+                            <option value="-no_of_dislikes" {% if request.GET.sort_by == "-no_of_dislikes" %}selected{% endif %}>Most Disliked</option>
+                            <option value="-no_of_comments" {% if request.GET.sort_by == "-no_of_comments" %}selected{% endif %}>Most Commented</option>
+                        </select>
+                    </form>
+                </div>
+                
 
 
                 <div class="container text-center" style="padding: 10px; margin-top:20px;">

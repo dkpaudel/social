@@ -202,29 +202,7 @@
                                     </div>
                                     
 
-                                    <!-- <div class="modal fade" id="followersModal" tabindex="-1"
-                                        aria-labelledby="followersModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-scrollable">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="followersModalLabel">Followers</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div id="followersContainer"
-                                                        class="overflow-y-auto h-64 bg-gray-100 rounded-lg p-3 shadow-inner border">
-                                                        <p class="text-gray-500 text-center">Loading users...</p>
-                                                    </div>
-
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary"
-                                                        data-bs-dismiss="modal">Close</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> -->
+                                    
                                     <br>
                                     <br><br><br>
                                     <div class="card-body p-4 text-black">
@@ -235,7 +213,8 @@
                                             </div>
 
                                         </div>
-                                        <div class="mb-5">
+                                      
+                                        <!-- <div class="mb-5">
                                             <p class="lead fw-normal mb-1">Photos</p>
 
 
@@ -259,8 +238,37 @@
 
 
                                             {% endfor %}
+                                        </div> -->
+                                        <div class="mb-5">
+                                            <p class="lead fw-normal mb-1">Photos</p>
+                                        
+                                            <!-- Sorting Dropdown -->
+                                            <form method="GET" action="">
+                                                <label for="sort">Sort by:</label>
+                                                <select name="sort_by" id="sort" onchange="this.form.submit()">
+                                                    <option value="most_recent" {% if selected_sort == 'most_recent' %}selected{% endif %}>Most Recent</option>
+                                                    <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Oldest</option>
+                                                    <option value="most_liked" {% if selected_sort == 'most_liked' %}selected{% endif %}>Most Liked</option>
+                                                    <option value="most_disliked" {% if selected_sort == 'most_disliked' %}selected{% endif %}>Most Disliked</option>
+                                                    <option value="most_commented" {% if selected_sort == 'most_commented' %}selected{% endif %}>Most Commented</option>
+                                                </select>
+                                            </form>
                                         </div>
-
+                                        
+                                        <div class="image-grid">
+                                            {% for pos in user_posts %}
+                                            <div class="card image-item">
+                                                <img src="{{ pos.image.url }}" class="card-img-top" alt="..." style="width: 219px; height: 219px;">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">{{ pos.caption }}</h5>
+                                                    {% if user == user_profile.user %}
+                                                        <a href="/delete/{{ pos.id }}"><i class="fa-solid fa-trash"></i></a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        
 
 
                                     </div>

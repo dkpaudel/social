@@ -169,25 +169,44 @@ def dislikes(request, id):
         post.save()
         return redirect('/#' + str(post.id))  # UUID should be converted to string
     
+
 @login_required(login_url='/loginn')
 def explore(request):
-    post=Post.objects.all().order_by('-created_at')
+    sort_by = request.GET.get('sort_by', '-created_at')  # Default: Most Recent
+    post = Post.objects.all().order_by(sort_by)
     profile = Profile.objects.get(user=request.user)
 
-    context={
-        'post':post,
-        'profile':profile
-        
+    context = {
+        'post': post,
+        'profile': profile,
     }
-    return render(request, 'explore.html',context)
+    return render(request, 'explore.html', context)
+
+
     
 @login_required(login_url='/loginn')
 def profile(request,id_user  ):
+  
     user_object = User.objects.get(username=id_user)
     print(user_object)
     profile = Profile.objects.get(user=request.user)
     user_profile = Profile.objects.get(user=user_object)
-    user_posts = Post.objects.filter(user=id_user).order_by('-created_at')
+
+    sort_option = request.GET.get('sort_by', '-created_at')
+
+    # Allowed sorting fields
+    allowed_sorts = {
+        'most_recent': '-created_at',
+        'oldest': 'created_at',
+        'most_liked': '-no_of_likes',
+        'most_disliked': '-no_of_dislikes',
+        'most_commented': '-no_of_comments',
+    }
+
+    # Validate sort option
+    order_by_field = allowed_sorts.get(sort_option, '-created_at')
+    user_posts = Post.objects.filter(user=id_user).order_by(order_by_field)
+   
     user_post_length = len(user_posts)
 
     follower = request.user.username
@@ -200,6 +219,8 @@ def profile(request,id_user  ):
 
     user_followers = len(Followers.objects.filter(user=id_user))
     user_following = len(Followers.objects.filter(follower=id_user))
+    
+
 
     context = {
         'user_object': user_object,
@@ -210,6 +231,7 @@ def profile(request,id_user  ):
         'follow_unfollow':follow_unfollow,
         'user_followers': user_followers,
         'user_following': user_following,
+        'selected_sort': sort_option,
     }
     
     
@@ -413,6 +435,5 @@ def fetch_followings(request,username):
        for following in followings
    ]
    return JsonResponse({"followings":followings_data})
-
 
 
