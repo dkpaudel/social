@@ -352,10 +352,36 @@ def fetch_comments(request, id):
 from .models import ChatRoom, ChatMessage
 from django.contrib.auth.models import User
 
+# @login_required(login_url='/loginn')
+# def chat_home(request):
+#     chat_rooms = ChatRoom.objects.filter(Q(user1=request.user) | Q(user2=request.user))
+  
+#     return render(request, 'chat/chat_home.html', {'chat_rooms': chat_rooms})
+from .models import ChatRoom, Profile
+from django.contrib.auth import get_user_model
+from django.db.models import Q, Prefetch
+
 @login_required(login_url='/loginn')
 def chat_home(request):
+    # Prefetch the profiles of users in the chat room (both user1 and user2)
     chat_rooms = ChatRoom.objects.filter(Q(user1=request.user) | Q(user2=request.user))
-    return render(request, 'chat/chat_home.html', {'chat_rooms': chat_rooms})
+    
+    # Prefetch profiles for both users in the chat room
+    # user1_profiles = Profile.objects.filter(user__in=[room.user1 for room in chat_rooms])
+    # user2_profiles = Profile.objects.filter(user__in=[room.user2 for room in chat_rooms])
+
+    profiles=Profile.objects.all()
+    return render(request, 'chat/chat_home.html', {
+        'chat_rooms': chat_rooms,
+        # 'user1_profiles': user1_profiles,
+        # 'user2_profiles': user2_profiles,
+        'profiles':profiles,
+    })
+
+
+
+
+
 
 @login_required(login_url='/loginn')
 def chat_room(request, room_id):
